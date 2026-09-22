@@ -6,11 +6,27 @@ export interface OptionCount {
   pct: number;
 }
 
+// Free-text "Other" answers that don't belong to the intended categories for a
+// question (e.g. joke or invalid entries under "What year of study") are kept
+// in the raw data but excluded from this question's chart.
+const ANSWER_ALLOWLIST: Record<number, string[]> = {
+  0: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+};
+
 export function aggregateQuestion(
   rows: Record<string, string>[],
-  header: string
+  header: string,
+  questionIndex?: number
 ): OptionCount[] {
-  const values = rows.map((r) => r[header]).filter((v) => v && v.length > 0);
+  let values = rows.map((r) => r[header]).filter((v) => v && v.length > 0);
+
+  const allow =
+    questionIndex !== undefined ? ANSWER_ALLOWLIST[questionIndex] : undefined;
+  if (allow) {
+    const allowSet = new Set(allow.map((a) => a.toLowerCase()));
+    values = values.filter((v) => allowSet.has(v.toLowerCase()));
+  }
+
   const total = values.length;
 
   const counts = new Map<string, number>();
