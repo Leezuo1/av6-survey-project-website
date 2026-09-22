@@ -9,7 +9,7 @@ export interface OptionCount {
 // Free-text "Other" answers that don't belong to the intended categories for a
 // question (e.g. joke or invalid entries under "What year of study") are kept
 // in the raw data but excluded from this question's chart.
-const ANSWER_ALLOWLIST: Record<number, string[]> = {
+export const ANSWER_ALLOWLIST: Record<number, string[]> = {
   0: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
 };
 

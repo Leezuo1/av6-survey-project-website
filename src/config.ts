@@ -5,3 +5,6 @@ export const SHEET_TSV_URL =
 
 export const SURVEY_TITLE =
   "The Impact of Social Media Self-Comparison on Students' Self-Esteem";
+
+export const GOOGLE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSf-s6VdH1FpQAySm15FwUCCNXYyHWMvO6Tb_mbxuZU856KscA/viewform";

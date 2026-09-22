@@ -1,13 +1,18 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { SurveyData } from "../types";
 import { aggregateQuestion } from "../lib/aggregate";
 import { averageOrdinalScore } from "../lib/score";
+import { scoreByGroup } from "../lib/correlation";
 import { KpiCard } from "./KpiCard";
+import { CorrelationChart } from "./CorrelationChart";
 
 // The attitude / frequency Likert items (excludes demographics Q0-Q3 and the
 // nominal "strategy" question Q14) — these are the statements worth ranking
 // against each other since they share the same 5-point scale shape.
 const ATTITUDE_INDICES = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15];
+
+// Demographic / behavioral dimensions worth splitting the attitude scores by.
+const GROUP_BY_INDICES = [0, 1, 2, 3];
 
 export function Analytics({ data }: { data: SurveyData }) {
   const ranked = useMemo(() => {
@@ -45,6 +50,29 @@ export function Analytics({ data }: { data: SurveyData }) {
 
   const top3 = ranked.slice(0, 3);
   const bottom3 = [...ranked].slice(-3).reverse();
+
+  const groupByOptions = data.questions.filter((q) =>
+    GROUP_BY_INDICES.includes(q.index)
+  );
+  const metricOptions = data.questions.filter((q) =>
+    ATTITUDE_INDICES.includes(q.index)
+  );
+
+  const [groupByIndex, setGroupByIndex] = useState(1); // default: hours/day
+  const [metricIndex, setMetricIndex] = useState(11); // default: overall impact
+
+  const groupByQ = data.questions.find((q) => q.index === groupByIndex);
+  const metricQ = data.questions.find((q) => q.index === metricIndex);
+
+  const correlationData = useMemo(() => {
+    if (!groupByQ || !metricQ) return [];
+    return scoreByGroup(
+      data.rows,
+      groupByQ.header,
+      groupByQ.index,
+      metricQ.header
+    );
+  }, [data, groupByQ, metricQ]);
 
   return (
     <div>
@@ -139,6 +167,49 @@ export function Analytics({ data }: { data: SurveyData }) {
             </ul>
           </div>
         </div>
+      </div>
+
+      <div className="panel correlation-panel">
+        <h3 className="panel-title">Correlation explorer</h3>
+        <p className="panel-hint">
+          Compare average score of a statement across groups of a
+          demographic/behavioral question.
+        </p>
+        <div className="correlation-controls">
+          <label className="correlation-field">
+            <span>Group by</span>
+            <select
+              className="filter-select"
+              value={groupByIndex}
+              onChange={(e) => setGroupByIndex(Number(e.target.value))}
+            >
+              {groupByOptions.map((q) => (
+                <option key={q.header} value={q.index}>
+                  Q{q.index}. {q.short}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="correlation-field">
+            <span>Score</span>
+            <select
+              className="filter-select"
+              value={metricIndex}
+              onChange={(e) => setMetricIndex(Number(e.target.value))}
+            >
+              {metricOptions.map((q) => (
+                <option key={q.header} value={q.index}>
+                  Q{q.index}. {q.short}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {correlationData.length > 0 ? (
+          <CorrelationChart data={correlationData} />
+        ) : (
+          <p className="panel-hint">Not enough data for this combination.</p>
+        )}
       </div>
     </div>
   );

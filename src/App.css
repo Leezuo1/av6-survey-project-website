@@ -126,6 +126,25 @@ body {
   height: 100%;
 }
 
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-form-link {
+  text-decoration: none;
+}
+
+.sidebar-sync {
+  font-size: 11px;
+  color: var(--sidebar-text);
+  padding: 0 10px;
+}
+
 /* Main content */
 .app-content {
   flex: 1;
@@ -168,6 +187,26 @@ body {
 
 .refresh-btn:hover {
   background: var(--hover-wash);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.export-btn {
+  background: var(--series-1);
+  border: 1px solid var(--series-1);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.export-btn:hover {
+  opacity: 0.9;
 }
 
 /* Filter bar */
@@ -411,6 +450,30 @@ body {
   line-height: 1.7;
 }
 
+.correlation-panel {
+  margin-top: 14px;
+}
+
+.correlation-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.correlation-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.correlation-field select {
+  min-width: 240px;
+}
+
 /* Data table */
 .table-toolbar {
   display: flex;
@@ -521,5 +584,39 @@ body {
   }
   .app-content {
     padding: 18px 16px 48px;
+  }
+}
+
+/* Print / export report */
+@media print {
+  .sidebar,
+  .refresh-btn,
+  .export-btn,
+  .filter-bar,
+  .correlation-controls,
+  .table-toolbar,
+  .pagination {
+    display: none !important;
+  }
+  .app-shell {
+    display: block;
+  }
+  .app-content {
+    padding: 0;
+  }
+  body {
+    background: white;
+  }
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-card,
+  .panel,
+  .kpi-card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  .analytics-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

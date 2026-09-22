@@ -25,12 +25,14 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("overview");
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
 
   async function load() {
     setState({ status: "loading" });
     try {
       const data = await fetchSurveyData(SHEET_TSV_URL);
       setState({ status: "ready", data });
+      setLastSyncedAt(new Date());
     } catch (err) {
       setState({
         status: "error",
@@ -64,6 +66,7 @@ export default function App() {
           active={tab}
           onChange={setTab}
           responseCount={state.data.rows.length}
+          lastSyncedAt={lastSyncedAt}
         />
       )}
       <div className="app-content">
@@ -74,9 +77,14 @@ export default function App() {
             </h1>
             <p className="app-subtitle">{SURVEY_TITLE}</p>
           </div>
-          <button className="refresh-btn" onClick={load}>
-            Refresh
-          </button>
+          <div className="header-actions">
+            <button className="export-btn" onClick={() => window.print()}>
+              Export report
+            </button>
+            <button className="refresh-btn" onClick={load}>
+              Refresh
+            </button>
+          </div>
         </header>
 
         {state.status === "ready" && tab !== "responses" && (

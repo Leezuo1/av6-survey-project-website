@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { GOOGLE_FORM_URL } from "../config";
 
 export type Tab = "overview" | "analytics" | "responses";
 
@@ -32,14 +33,36 @@ const LABELS: Record<Tab, string> = {
   responses: "Responses",
 };
 
+const FORM_ICON = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M14 3v5h5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M8 13h8M8 17h5" strokeLinecap="round" />
+  </svg>
+);
+
+function formatSyncedAt(date: Date | null): string {
+  if (!date) return "Not synced yet";
+  return `Synced ${date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+}
+
 export function Sidebar({
   active,
   onChange,
   responseCount,
+  lastSyncedAt,
 }: {
   active: Tab;
   onChange: (t: Tab) => void;
   responseCount: number;
+  lastSyncedAt: Date | null;
 }) {
   return (
     <aside className="sidebar">
@@ -62,6 +85,19 @@ export function Sidebar({
           </button>
         ))}
       </nav>
+
+      <div className="sidebar-footer">
+        <a
+          className="sidebar-item sidebar-form-link"
+          href={GOOGLE_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="sidebar-icon">{FORM_ICON}</span>
+          Open survey form
+        </a>
+        <div className="sidebar-sync">{formatSyncedAt(lastSyncedAt)}</div>
+      </div>
     </aside>
   );
 }
